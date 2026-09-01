@@ -1,24 +1,25 @@
 import { createFileRoute } from "@tanstack/react-router";
+import { GuitarGame } from "@/components/game/GuitarGame";
 
-// No head() here: the home route inherits title/description/og/twitter from
-// __root.tsx, and ships no og:image so serve-time hosting can inject the
-// project's social preview (explicit og:image or latest screenshot).
 export const Route = createFileRoute("/")({
-  component: Index,
+  ssr: false,
+  head: () => ({
+    meta: [
+      { title: "Stage Tour — 3D Guitar Rhythm Game" },
+      {
+        name: "description",
+        content:
+          "Play Fade to Black on a full 3D note highway. Real Clone Hero chart and multitrack stems, five frets, sustains, star power and a rock meter.",
+      },
+      { property: "og:title", content: "Stage Tour — 3D Guitar Rhythm Game" },
+      {
+        property: "og:description",
+        content:
+          "A browser guitar rhythm game with a 3D wooden highway, expert chart parsing and live multitrack audio.",
+      },
+      { property: "og:type", content: "website" },
+      { name: "twitter:card", content: "summary_large_image" },
+    ],
+  }),
+  component: GuitarGame,
 });
-
-// IMPORTANT: Replace this placeholder. See ./README.md for routing conventions.
-function Index() {
-  return (
-    <div
-      className="flex min-h-screen items-center justify-center"
-      style={{ backgroundColor: "#fcfbf8" }}
-    >
-      <img
-        data-lovable-blank-page-placeholder="REMOVE_THIS"
-        src="https://cdn.gpteng.co/blank-app-v1.svg"
-        alt="Your app will live here!"
-      />
-    </div>
-  );
-}
