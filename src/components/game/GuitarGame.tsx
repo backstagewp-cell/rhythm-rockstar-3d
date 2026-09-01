@@ -16,18 +16,8 @@ import vocalsAsset from "@/assets/vocals.ogg.asset.json";
 
 const SONG = { name: "Fade to Black", artist: "Metallica", album: "Ride the Lightning", year: 1984 };
 const STEMS = [songAsset.url, guitarAsset.url, rhythmAsset.url, drumsAsset.url, vocalsAsset.url];
-const KEY_MAP: Record<string, number> = {
-  a: 0,
-  s: 1,
-  d: 2,
-  f: 3,
-  g: 4,
-  "1": 0,
-  "2": 1,
-  "3": 2,
-  "4": 3,
-  "5": 4,
-};
+const DEFAULT_KEYS = ["a", "s", "d", "f", "g"];
+const FRET_NAMES = ["Verde", "Vermelho", "Amarelo", "Azul", "Laranja"];
 
 type Phase = "loading" | "ready" | "playing" | "finished";
 
@@ -38,6 +28,9 @@ export function GuitarGame() {
   const [loadPct, setLoadPct] = useState(0);
   const [hud, setHud] = useState<HudSnapshot | null>(null);
   const [progress, setProgress] = useState(0);
+  const [keys, setKeys] = useState(DEFAULT_KEYS);
+  const [editingKey, setEditingKey] = useState<number | null>(null);
+  const [controlsOpen, setControlsOpen] = useState(false);
 
   const engineRef = useRef<GameEngine | null>(null);
   const audioRef = useRef<HTMLAudioElement[]>([]);
@@ -45,6 +38,7 @@ export function GuitarGame() {
   const rafRef = useRef(0);
 
   const getTime = useCallback(() => timeRef.current, []);
+  const keyMap = useMemo(() => Object.fromEntries(keys.map((key, lane) => [key, lane])), [keys]);
 
   // Load chart + audio
   useEffect(() => {
@@ -123,7 +117,7 @@ export function GuitarGame() {
 
   // Input
   useEffect(() => {
-    if (phase !== "playing") return;
+    if (phase !== "playing" || controlsOpen || editingKey !== null) return;
     const engine = engineRef.current!;
     const down = (e: KeyboardEvent) => {
       if (e.repeat) return;
@@ -132,13 +126,13 @@ export function GuitarGame() {
         engine.activateStarPower();
         return;
       }
-      const lane = KEY_MAP[key];
+      const lane = keyMap[key];
       if (lane === undefined) return;
       e.preventDefault();
       engine.press(lane, timeRef.current);
     };
     const up = (e: KeyboardEvent) => {
-      const lane = KEY_MAP[e.key.toLowerCase()];
+      const lane = keyMap[e.key.toLowerCase()];
       if (lane !== undefined) engine.release(lane);
     };
     window.addEventListener("keydown", down);
@@ -147,7 +141,30 @@ export function GuitarGame() {
       window.removeEventListener("keydown", down);
       window.removeEventListener("keyup", up);
     };
-  }, [phase]);
+  }, [controlsOpen, editingKey, keyMap, phase]);
+
+  useEffect(() => {
+    if (editingKey === null) return;
+    const captureKey = (e: KeyboardEvent) => {
+      e.preventDefault();
+      if (e.key === "Escape") {
+        setEditingKey(null);
+        return;
+      }
+      const key = e.key.toLowerCase();
+      if (["shift", "control", "alt", "meta"].includes(key)) return;
+      setKeys((current) => {
+        const previousKey = current[editingKey];
+        return current.map((value, index) => {
+          if (index === editingKey) return key;
+          return value === key ? previousKey : value;
+        });
+      });
+      setEditingKey(null);
+    };
+    window.addEventListener("keydown", captureKey);
+    return () => window.removeEventListener("keydown", captureKey);
+  }, [editingKey]);
 
   const start = useCallback(() => {
     const engine = new GameEngine(chart!.notes);
@@ -182,7 +199,7 @@ export function GuitarGame() {
             gl.toneMapping = THREE.ACESFilmicToneMapping;
           }}
         >
-          <color attach="background" args={["#0a0204"]} />
+          <color attach="background" args={["#000000"]} />
           <Suspense fallback={null}>
             <HighwayScene engine={engine} getTime={getTime} />
           </Suspense>
@@ -192,8 +209,53 @@ export function GuitarGame() {
   );
 
   return (
-    <div className="fixed inset-0 overflow-hidden bg-background">
+    <div className="fixed inset-0 overflow-hidden bg-black">
       {canvas}
+
+      <button
+        type="button"
+        onClick={() => setControlsOpen(true)}
+        className="absolute right-5 top-5 z-30 rounded-lg border border-border/60 bg-card/80 px-4 py-2 text-xs font-semibold uppercase tracking-wider text-foreground backdrop-blur transition hover:bg-card"
+      >
+        Configurar teclas
+      </button>
+
+      {controlsOpen && (
+        <div className="absolute inset-0 z-40 flex items-center justify-center bg-black/70 px-6 backdrop-blur-sm">
+          <div className="w-full max-w-sm rounded-2xl border border-border/60 bg-card p-6 shadow-2xl">
+            <div className="flex items-start justify-between gap-4">
+              <div>
+                <h2 className="font-display text-2xl text-foreground">Teclas de comando</h2>
+                <p className="mt-1 text-sm text-muted-foreground">Clique em uma tecla e pressione a nova opção.</p>
+              </div>
+              <button type="button" onClick={() => setControlsOpen(false)} className="text-muted-foreground transition hover:text-foreground" aria-label="Fechar menu de teclas">
+                ✕
+              </button>
+            </div>
+            <div className="mt-5 space-y-2">
+              {keys.map((key, index) => (
+                <div key={FRET_NAMES[index]} className="flex items-center justify-between rounded-lg bg-muted/50 px-3 py-2.5">
+                  <span className="text-sm text-foreground">{FRET_NAMES[index]}</span>
+                  <button
+                    type="button"
+                    onClick={() => setEditingKey(index)}
+                    className="min-w-20 rounded-md border border-border bg-background px-3 py-1 font-mono text-sm uppercase text-foreground transition hover:border-primary"
+                  >
+                    {editingKey === index ? "Pressione..." : key}
+                  </button>
+                </div>
+              ))}
+            </div>
+            <button
+              type="button"
+              onClick={() => setKeys(DEFAULT_KEYS)}
+              className="mt-5 text-xs font-semibold uppercase tracking-wider text-muted-foreground transition hover:text-foreground"
+            >
+              Restaurar padrão
+            </button>
+          </div>
+        </div>
+      )}
 
       {phase === "playing" && hud && (
         <HUD
@@ -207,10 +269,10 @@ export function GuitarGame() {
       )}
 
       {(phase === "loading" || phase === "ready" || phase === "finished") && (
-        <div className="absolute inset-0 z-20 flex items-center justify-center bg-gradient-to-b from-background/85 via-background/70 to-background/95 px-6 backdrop-blur-sm">
+        <div className="absolute inset-0 z-20 flex items-center justify-center bg-gradient-to-b from-black/85 via-black/70 to-black/95 px-6 backdrop-blur-sm">
           <div className="w-full max-w-md text-center">
             <p className="font-display text-5xl tracking-tight text-foreground drop-shadow-[0_0_26px_rgba(255,50,50,0.45)] md:text-6xl">
-              STAGE TOUR
+              GUITAR TOUR
             </p>
             <p className="mt-2 text-xs uppercase tracking-[0.4em] text-muted-foreground">
               Expert Lead Guitar
