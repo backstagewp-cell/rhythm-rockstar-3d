@@ -94,7 +94,7 @@ function Notes({ engine, getTime }: { engine: GameEngine; getTime: () => number 
       const n = notes[i]!;
       const dt = n.time - now;
       if (dt > VISIBLE_AHEAD) break;
-      if (engine.states[i] !== 0) continue;
+      if (engine.states[i] !== 0 || dt < -0.06) continue;
 
       const gem = gems.current[slot];
       const tail = tails.current[slot];
@@ -201,22 +201,23 @@ export function HighwayScene({
 
   return (
     <>
-      <fog attach="fog" args={["#120306", 26, 46]} />
-      <ambientLight intensity={0.5} />
-      <directionalLight position={[3, 9, 6]} intensity={1.1} color="#ffd9d9" />
+      <fog attach="fog" args={["#1a0508", 40, 78]} />
+      <ambientLight intensity={1.5} />
+      <directionalLight position={[3, 10, 8]} intensity={2.2} color="#ffe6e0" />
+      <spotLight position={[0, 12, 4]} angle={0.7} penumbra={0.6} intensity={90} distance={40} color="#fff2ea" />
       <pointLight ref={spot} position={[0, 6, -14]} distance={60} color="#ff3a3a" intensity={12} />
 
       {/* stage backdrop */}
       <mesh position={[0, 7.5, -42]}>
         <planeGeometry args={[78, 44]} />
-        <meshBasicMaterial map={backdrop} toneMapped={false} />
+        <meshBasicMaterial map={backdrop} toneMapped={false} fog={false} color="#ffd8d8" />
       </mesh>
 
       {/* highway */}
       <group rotation-x={-Math.PI / 2}>
         <mesh receiveShadow>
           <planeGeometry args={[4.7, 80]} />
-          <meshStandardMaterial map={wood} roughness={0.55} metalness={0.15} color="#8a7a6a" />
+          <meshStandardMaterial map={wood} roughness={0.5} metalness={0.1} color="#e0c9ac" />
         </mesh>
       </group>
       {/* lane dividers */}

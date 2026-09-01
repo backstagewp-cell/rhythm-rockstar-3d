@@ -27,7 +27,7 @@ export class GameEngine {
   score = 0;
   combo = 0;
   streakBest = 0;
-  health = 0.5;
+  health = 0.6;
   starPower = 0;
   spActive = false;
   notesHit = 0;
@@ -91,7 +91,7 @@ export class GameEngine {
 
   private registerMiss(now: number) {
     this.combo = 0;
-    this.health = Math.max(0, this.health - 0.05);
+    this.health = Math.max(0, this.health - 0.035);
     this.lastMissAt = now;
     if (this.health <= 0) this.failed = true;
   }
