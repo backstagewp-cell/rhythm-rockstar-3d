@@ -92,7 +92,7 @@ export function GuitarGame() {
   useEffect(() => {
     if (phase !== "playing") return;
     const engine = engineRef.current!;
-    const master = audioRef.current[0];
+    const master = audioRef.current[0]!;
     let hudTick = 0;
 
     const loop = () => {

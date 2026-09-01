@@ -35,8 +35,8 @@ function Fret({ lane, engine }: { lane: number; engine: GameEngine }) {
   const glow = useRef<THREE.Mesh>(null);
 
   useFrame(() => {
-    const f = engine.flash[lane];
-    const pressed = engine.held[lane];
+    const f = engine.flash[lane as 0];
+    const pressed = engine.held[lane as 0];
     if (glow.current) {
       const m = glow.current.material as THREE.MeshBasicMaterial;
       m.opacity = 0.12 + f * 0.85 + (pressed ? 0.25 : 0);
@@ -49,11 +49,11 @@ function Fret({ lane, engine }: { lane: number; engine: GameEngine }) {
   });
 
   return (
-    <group position={[LANE_X[lane], 0.02, 0]}>
+    <group position={[LANE_X[lane as 0], 0.02, 0]}>
       <mesh ref={glow} rotation-x={-Math.PI / 2} position-y={0.03}>
         <circleGeometry args={[0.42, 32]} />
         <meshBasicMaterial
-          color={LANE_COLORS[lane]}
+          color={LANE_COLORS[lane as 0]}
           transparent
           opacity={0.2}
           blending={THREE.AdditiveBlending}
@@ -64,7 +64,7 @@ function Fret({ lane, engine }: { lane: number; engine: GameEngine }) {
         <ringGeometry args={[0.34, 0.46, 32]} />
         <meshStandardMaterial
           color="#d8dde6"
-          emissive={LANE_COLORS[lane]}
+          emissive={LANE_COLORS[lane as 0]}
           emissiveIntensity={0.35}
           metalness={0.9}
           roughness={0.25}
@@ -90,7 +90,7 @@ function Notes({ engine, getTime }: { engine: GameEngine; getTime: () => number 
 
     let slot = 0;
     for (let i = cursor.current; i < notes.length && slot < POOL; i++) {
-      const n = notes[i];
+      const n = notes[i]!;
       const dt = n.time - now;
       if (dt > VISIBLE_AHEAD) break;
       if (engine.states[i] !== 0) continue;
@@ -101,9 +101,9 @@ function Notes({ engine, getTime }: { engine: GameEngine; getTime: () => number 
 
       const z = -dt * NOTE_SPEED;
       gem.visible = true;
-      gem.position.set(LANE_X[n.lane], 0.16, z);
+      gem.position.set(LANE_X[n.lane as 0], 0.16, z);
       const mat = gem.material as THREE.MeshStandardMaterial;
-      const col = engine.spActive ? "#ffffff" : LANE_COLORS[n.lane];
+      const col = engine.spActive ? "#ffffff" : LANE_COLORS[n.lane as 0];
       mat.color.set(col);
       mat.emissive.set(n.sp ? "#bfe9ff" : col);
       mat.emissiveIntensity = n.sp ? 1.2 : 0.55;
@@ -112,16 +112,16 @@ function Notes({ engine, getTime }: { engine: GameEngine; getTime: () => number 
         const len = n.duration * NOTE_SPEED;
         tail.visible = true;
         tail.scale.set(1, 1, len);
-        tail.position.set(LANE_X[n.lane], 0.1, z - len / 2);
-        (tail.material as THREE.MeshBasicMaterial).color.set(LANE_COLORS[n.lane]);
+        tail.position.set(LANE_X[n.lane as 0], 0.1, z - len / 2);
+        (tail.material as THREE.MeshBasicMaterial).color.set(LANE_COLORS[n.lane as 0]);
       } else {
         tail.visible = false;
       }
       slot++;
     }
     for (let s = slot; s < POOL; s++) {
-      if (gems.current[s]) gems.current[s].visible = false;
-      if (tails.current[s]) tails.current[s].visible = false;
+      if (gems.current[s]) gems.current[s]!.visible = false;
+      if (tails.current[s]) tails.current[s]!.visible = false;
     }
   });
 

@@ -2,8 +2,8 @@ import type { ChartNote } from "./chart";
 
 export const LANES = 5;
 export const HIT_WINDOW = 0.11; // seconds either side
-export const LANE_X = [-1.8, -0.9, 0, 0.9, 1.8];
-export const LANE_COLORS = ["#2ee06a", "#ff3b3b", "#ffd230", "#2f8fff", "#ff8a1f"];
+export const LANE_X = [-1.8, -0.9, 0, 0.9, 1.8] as const;
+export const LANE_COLORS = ["#2ee06a", "#ff3b3b", "#ffd230", "#2f8fff", "#ff8a1f"] as const;
 
 export type NoteState = 0 | 1 | 2; // pending | hit | missed
 
@@ -33,8 +33,8 @@ export class GameEngine {
   notesHit = 0;
   failed = false;
 
-  held = [false, false, false, false, false];
-  flash = [0, 0, 0, 0, 0];
+  held: [boolean, boolean, boolean, boolean, boolean] = [false, false, false, false, false];
+  flash: [number, number, number, number, number] = [0, 0, 0, 0, 0];
   lastMissAt = -10;
 
   private cursor = 0; // first index not yet resolved
@@ -57,11 +57,11 @@ export class GameEngine {
   }
 
   press(lane: number, now: number) {
-    this.held[lane] = true;
+    this.held[lane as 0] = true;
     let best = -1;
     let bestDelta = Infinity;
     for (let i = this.cursor; i < this.notes.length; i++) {
-      const n = this.notes[i];
+      const n = this.notes[i]!;
       if (n.time > now + HIT_WINDOW) break;
       if (n.lane !== lane || this.states[i] !== 0) continue;
       const d = Math.abs(n.time - now);
@@ -72,21 +72,21 @@ export class GameEngine {
     }
     if (best >= 0) {
       this.states[best] = 1;
-      this.sustainOn[best] = this.notes[best].duration > 0;
+      this.sustainOn[best] = this.notes[best]!.duration > 0;
       this.notesHit++;
       this.combo++;
       this.streakBest = Math.max(this.streakBest, this.combo);
       this.score += 50 * this.multiplier;
       this.health = Math.min(1, this.health + 0.012);
-      this.flash[lane] = 1;
-      if (this.notes[best].sp) this.starPower = Math.min(1, this.starPower + 0.02);
+      this.flash[lane as 0] = 1;
+      if (this.notes[best]!.sp) this.starPower = Math.min(1, this.starPower + 0.02);
     } else {
       this.registerMiss(now);
     }
   }
 
   release(lane: number) {
-    this.held[lane] = false;
+    this.held[lane as 0] = false;
   }
 
   private registerMiss(now: number) {
@@ -99,7 +99,7 @@ export class GameEngine {
   /** Advance time: resolve missed notes and award sustains. */
   update(now: number, delta: number) {
     while (this.cursor < this.notes.length) {
-      const n = this.notes[this.cursor];
+      const n = this.notes[this.cursor]!;
       if (n.time + n.duration + HIT_WINDOW > now) break;
       if (this.states[this.cursor] === 0) {
         this.states[this.cursor] = 2;
@@ -108,7 +108,7 @@ export class GameEngine {
       this.cursor++;
     }
     for (let i = this.cursor; i < this.notes.length; i++) {
-      const n = this.notes[i];
+      const n = this.notes[i]!;
       if (n.time > now + HIT_WINDOW) break;
       if (this.states[i] === 0 && n.time < now - HIT_WINDOW) {
         this.states[i] = 2;
@@ -117,7 +117,7 @@ export class GameEngine {
       if (this.sustainOn[i]) {
         if (now > n.time + n.duration) {
           this.sustainOn[i] = false;
-        } else if (this.held[n.lane]) {
+        } else if (this.held[n.lane as 0]) {
           this.score += 220 * this.multiplier * delta;
         } else {
           this.sustainOn[i] = false;
@@ -129,7 +129,7 @@ export class GameEngine {
       if (this.starPower <= 0) this.spActive = false;
     }
     for (let l = 0; l < LANES; l++) {
-      this.flash[l] = Math.max(0, this.flash[l] - delta * 5);
+      this.flash[l as 0] = Math.max(0, this.flash[l as 0] - delta * 5);
     }
   }
 
