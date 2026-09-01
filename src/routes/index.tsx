@@ -5,7 +5,7 @@ export const Route = createFileRoute("/")({
   ssr: false,
   head: () => ({
     meta: [
-      { title: "Stage Tour — 3D Guitar Rhythm Game" },
+      { title: "GUITAR TOUR" },
       {
         name: "description",
         content:
