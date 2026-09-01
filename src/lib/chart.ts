@@ -25,6 +25,7 @@ export async function loadChart(url: string): Promise<Chart> {
     midi.tracks.find((t) => t.name === "PART GUITAR") ??
     midi.tracks.find((t) => (t.name ?? "").includes("GUITAR")) ??
     midi.tracks[0];
+  if (!track) throw new Error("No guitar track found in notes.mid");
 
   const spRanges = track.notes
     .filter((n) => n.midi === 116)

@@ -85,8 +85,9 @@ function Notes({ engine, getTime }: { engine: GameEngine; getTime: () => number 
     const notes = engine.notes;
 
     // rewind cursor if the song was restarted / seeked back
-    while (cursor.current > 0 && notes[cursor.current - 1]?.time > now - 0.5) cursor.current--;
-    while (cursor.current < notes.length && notes[cursor.current].time < now - 0.5) cursor.current++;
+    while (cursor.current > 0 && notes[cursor.current - 1]!.time > now - 0.5) cursor.current--;
+    while (cursor.current < notes.length && notes[cursor.current]!.time < now - 0.5)
+      cursor.current++;
 
     let slot = 0;
     for (let i = cursor.current; i < notes.length && slot < POOL; i++) {
