@@ -3,7 +3,6 @@ import { useMemo, useRef } from "react";
 import * as THREE from "three";
 
 import { GameEngine, LANE_COLORS, LANE_X } from "@/lib/engine";
-import stageAsset from "@/assets/stage.jpg.asset.json";
 
 export const NOTE_SPEED = 11; // world units per second
 const VISIBLE_AHEAD = 3.4; // seconds of chart visible
@@ -187,8 +186,6 @@ export function HighwayScene({
   getTime: () => number;
 }) {
   const wood = useMemo(() => makeWoodTexture(), []);
-  const backdrop = useLoader(THREE.TextureLoader, stageAsset.url);
-  backdrop.colorSpace = THREE.SRGBColorSpace;
 
   const spot = useRef<THREE.PointLight>(null);
   useFrame((_, delta) => {
@@ -201,7 +198,7 @@ export function HighwayScene({
 
   return (
     <>
-      <fog attach="fog" args={["#1a0508", 40, 78]} />
+      <fog attach="fog" args={["#000000", 40, 78]} />
       <ambientLight intensity={1.5} />
       <directionalLight position={[3, 10, 8]} intensity={2.2} color="#ffe6e0" />
       <spotLight position={[0, 12, 4]} angle={0.7} penumbra={0.6} intensity={90} distance={40} color="#fff2ea" />
@@ -210,7 +207,7 @@ export function HighwayScene({
       {/* stage backdrop */}
       <mesh position={[0, 7.5, -42]}>
         <planeGeometry args={[78, 44]} />
-        <meshBasicMaterial map={backdrop} toneMapped={false} fog={false} color="#ffd8d8" />
+        <meshBasicMaterial color="#000000" fog={false} />
       </mesh>
 
       {/* highway */}
