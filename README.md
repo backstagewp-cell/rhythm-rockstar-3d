@@ -1,14 +1,18 @@
-# Welcome to your Lovable project
+# Rhythm Star Stage
+
+guitar hero like game, full 3d bar, use the imagem reference, the music and notes has to be load by the archives: notes.midi, song.ini, song.ogg. use the archives send as the music example on the game
 
 This project was built with [Lovable](https://lovable.dev).
 
+**Live app**: https://rhythm-rockstar-3d.lovable.app
+
 ## Build with Lovable
 
-Open your project in the [Lovable editor](https://lovable.dev) and keep building.
+Continue developing this project in the [Lovable editor](https://lovable.dev/projects/a1ac5a71-ff81-4875-ab56-e23e5c8348ac).
 
 - **Ship faster**: describe what you want to build and Lovable handles the code.
-- **Stay in sync**: connect the project to GitHub and every change made in Lovable is committed straight to your repository.
-- **Full ownership**: this code is yours. Push to your repository and your changes sync back into Lovable, ready for your next prompt.
+- **Stay in sync**: every change made in Lovable is committed straight to this repository.
+- **Full ownership**: this code is yours. Push to `main` on GitHub and your changes sync back into Lovable, ready for your next prompt.
 
 ## Development
 
@@ -20,10 +24,3 @@ cd <repository-name>
 npm i
 npm run dev
 ```
-
-## Built with
-
-- TanStack Start
-- TypeScript
-- React
-- Tailwind CSS
