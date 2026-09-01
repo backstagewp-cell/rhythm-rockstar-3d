@@ -18,7 +18,7 @@ export const Route = createFileRoute("/")({
           "A browser guitar rhythm game with a 3D wooden highway, expert chart parsing and live multitrack audio.",
       },
       { property: "og:type", content: "website" },
-      { name: "twitter:card", content: "summary_large_image" },
+      { name: "twitter:card", content: "resumo curto_large_image" },
     ],
   }),
   component: GuitarGame,
