@@ -76,6 +76,7 @@ function Fret({ lane, engine }: { lane: number; engine: GameEngine }) {
 
 function Notes({ engine, getTime }: { engine: GameEngine; getTime: () => number }) {
   const gems = useRef<THREE.Mesh[]>([]);
+  const caps = useRef<THREE.Mesh[]>([]);
   const tails = useRef<THREE.Mesh[]>([]);
   const cursor = useRef(0);
 
@@ -96,24 +97,31 @@ function Notes({ engine, getTime }: { engine: GameEngine; getTime: () => number 
       if (engine.states[i] !== 0 || dt < -0.06) continue;
 
       const gem = gems.current[slot];
+      const cap = caps.current[slot];
       const tail = tails.current[slot];
-      if (!gem || !tail) break;
+      if (!gem || !tail || !cap) break;
 
       const z = -dt * NOTE_SPEED;
+      const x = LANE_X[n.lane as 0];
+      const col = engine.spActive ? "#e8f6ff" : LANE_COLORS[n.lane as 0];
+
       gem.visible = true;
-      gem.position.set(LANE_X[n.lane as 0], 0.16, z);
+      gem.position.set(x, 0.09, z);
       const mat = gem.material as THREE.MeshStandardMaterial;
-      const col = engine.spActive ? "#ffffff" : LANE_COLORS[n.lane as 0];
       mat.color.set(col);
-      mat.emissive.set(n.sp ? "#bfe9ff" : col);
-      mat.emissiveIntensity = n.sp ? 1.2 : 0.55;
+      mat.emissive.set(col);
+      mat.emissiveIntensity = n.sp ? 1.4 : 0.9;
+
+      cap.visible = true;
+      cap.position.set(x, 0.165, z);
+      (cap.material as THREE.MeshBasicMaterial).color.set(n.sp ? "#dff2ff" : "#ffffff");
 
       if (n.duration > 0) {
         const len = n.duration * NOTE_SPEED;
         tail.visible = true;
         tail.scale.set(1, 1, len);
-        tail.position.set(LANE_X[n.lane as 0], 0.1, z - len / 2);
-        (tail.material as THREE.MeshBasicMaterial).color.set(LANE_COLORS[n.lane as 0]);
+        tail.position.set(x, 0.05, z - len / 2);
+        (tail.material as THREE.MeshBasicMaterial).color.set(col);
       } else {
         tail.visible = false;
       }
@@ -121,6 +129,7 @@ function Notes({ engine, getTime }: { engine: GameEngine; getTime: () => number 
     }
     for (let s = slot; s < POOL; s++) {
       if (gems.current[s]) gems.current[s]!.visible = false;
+      if (caps.current[s]) caps.current[s]!.visible = false;
       if (tails.current[s]) tails.current[s]!.visible = false;
     }
   });
@@ -137,9 +146,10 @@ function Notes({ engine, getTime }: { engine: GameEngine; getTime: () => number 
             }}
             visible={false}
           >
-            <boxGeometry args={[0.22, 0.04, 1]} />
-            <meshBasicMaterial transparent opacity={0.55} blending={THREE.AdditiveBlending} />
+            <boxGeometry args={[0.16, 0.03, 1]} />
+            <meshBasicMaterial transparent opacity={0.75} blending={THREE.AdditiveBlending} />
           </mesh>
+          {/* flat Rock Band style bar */}
           <mesh
             ref={(m) => {
               if (m) gems.current[i] = m;
@@ -147,14 +157,26 @@ function Notes({ engine, getTime }: { engine: GameEngine; getTime: () => number 
             visible={false}
             castShadow
           >
-            <cylinderGeometry args={[0.38, 0.3, 0.22, 24]} />
-            <meshStandardMaterial metalness={0.35} roughness={0.25} />
+            <boxGeometry args={[0.74, 0.14, 0.3]} />
+            <meshStandardMaterial metalness={0.2} roughness={0.3} />
+          </mesh>
+          {/* bright top highlight strip */}
+          <mesh
+            ref={(m) => {
+              if (m) caps.current[i] = m;
+            }}
+            visible={false}
+            rotation-x={-Math.PI / 2}
+          >
+            <planeGeometry args={[0.66, 0.2]} />
+            <meshBasicMaterial transparent opacity={0.95} />
           </mesh>
         </group>
       ))}
     </group>
   );
 }
+
 
 function BeatLines({ getTime }: { getTime: () => number }) {
   const group = useRef<THREE.Group>(null);
