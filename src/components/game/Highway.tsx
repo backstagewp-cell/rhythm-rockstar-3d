@@ -236,13 +236,26 @@ export function HighwayScene({
       <group rotation-x={-Math.PI / 2}>
         <mesh receiveShadow>
           <planeGeometry args={[4.7, 80]} />
-          <meshStandardMaterial map={wood} roughness={0.5} metalness={0.1} color="#e0c9ac" />
+          <meshStandardMaterial map={wood} roughness={0.65} metalness={0.15} color="#3a2a20" />
         </mesh>
       </group>
+      {/* colored lane laser lines */}
+      {[0, 1, 2, 3, 4].map((l) => (
+        <mesh key={l} rotation-x={-Math.PI / 2} position={[LANE_X[l as 0], 0.013, -20]}>
+          <planeGeometry args={[0.045, 80]} />
+          <meshBasicMaterial
+            color={LANE_COLORS[l as 0]}
+            transparent
+            opacity={0.85}
+            blending={THREE.AdditiveBlending}
+          />
+        </mesh>
+      ))}
       {/* lane dividers */}
       {[-1.35, -0.45, 0.45, 1.35].map((x) => (
         <mesh key={x} rotation-x={-Math.PI / 2} position={[x, 0.014, -20]}>
           <planeGeometry args={[0.02, 80]} />
+
           <meshBasicMaterial color="#e8e8e8" transparent opacity={0.25} />
         </mesh>
       ))}
