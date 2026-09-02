@@ -154,7 +154,7 @@ export function GuitarGame() {
       const key = e.key.toLowerCase();
       if (["shift", "control", "alt", "meta"].includes(key)) return;
       setKeys((current) => {
-        const previousKey = current[editingKey];
+        const previousKey = current[editingKey] ?? key;
         return current.map((value, index) => {
           if (index === editingKey) return key;
           return value === key ? previousKey : value;
