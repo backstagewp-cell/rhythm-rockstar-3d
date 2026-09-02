@@ -193,9 +193,9 @@ export function GuitarGame() {
         <Canvas
           shadows
           dpr={[1, 1.75]}
-          camera={{ position: [0, 3.1, 6.4], fov: 58 }}
+          camera={{ position: [0, 4.4, 5.0], fov: 52 }}
           onCreated={({ camera, gl }) => {
-            camera.lookAt(new THREE.Vector3(0, 0.4, -9));
+            camera.lookAt(new THREE.Vector3(0, 0.2, -7));
             gl.toneMapping = THREE.ACESFilmicToneMapping;
           }}
         >
