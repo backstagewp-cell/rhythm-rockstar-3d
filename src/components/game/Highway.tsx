@@ -5,7 +5,7 @@ import * as THREE from "three";
 import { GameEngine, LANE_COLORS, LANE_X } from "@/lib/engine";
 
 export const NOTE_SPEED = 11; // world units per second
-const VISIBLE_AHEAD = 3.4; // seconds of chart visible
+const VISIBLE_AHEAD = 2.6; // seconds of chart visible
 const POOL = 96;
 const LANE_W = 0.9;
 
@@ -181,12 +181,13 @@ function Fret({
           opacity={0.3}
           blending={THREE.AdditiveBlending}
           depthWrite={false}
+          toneMapped={false}
         />
       </mesh>
       {/* pad plate */}
       <mesh ref={plate} rotation-x={-Math.PI / 2} position={[0, 0.02, 0]}>
         <planeGeometry args={[LANE_W * 0.92, 0.62]} />
-        <meshBasicMaterial map={pad} color={color} transparent depthWrite={false} />
+        <meshBasicMaterial map={pad} color={color} transparent depthWrite={false} toneMapped={false} />
       </mesh>
       {/* hit burst */}
       <mesh ref={burst} rotation-x={-Math.PI / 2} position={[0, 0.05, 0]} visible={false}>
@@ -198,6 +199,7 @@ function Fret({
           opacity={0}
           blending={THREE.AdditiveBlending}
           depthWrite={false}
+          toneMapped={false}
         />
       </mesh>
     </group>
@@ -293,6 +295,7 @@ function Notes({
               opacity={0.85}
               blending={THREE.AdditiveBlending}
               depthWrite={false}
+              toneMapped={false}
             />
           </mesh>
           {/* glow under gem */}
@@ -310,6 +313,7 @@ function Notes({
               opacity={0.5}
               blending={THREE.AdditiveBlending}
               depthWrite={false}
+              toneMapped={false}
             />
           </mesh>
           {/* gem */}
@@ -321,7 +325,7 @@ function Notes({
             rotation-x={-Math.PI / 2}
           >
             <planeGeometry args={[LANE_W * 0.92, 0.44]} />
-            <meshBasicMaterial map={gem} transparent depthWrite={false} />
+            <meshBasicMaterial map={gem} transparent depthWrite={false} toneMapped={false} />
           </mesh>
         </group>
       ))}
@@ -372,7 +376,7 @@ export function HighwayScene({ engine, getTime }: { engine: GameEngine; getTime:
 
   return (
     <>
-      <fog attach="fog" args={["#050508", 26, 60]} />
+      <fog attach="fog" args={["#050508", 18, 34]} />
       <ambientLight intensity={0.9} />
       <directionalLight position={[3, 10, 8]} intensity={1.2} color="#ffe6e0" />
       <pointLight ref={spot} position={[0, 6, -14]} distance={60} color="#ff3a3a" intensity={12} />
@@ -394,6 +398,7 @@ export function HighwayScene({ engine, getTime }: { engine: GameEngine; getTime:
               opacity={0.9}
               blending={THREE.AdditiveBlending}
               depthWrite={false}
+              toneMapped={false}
             />
           </mesh>
           <mesh rotation-x={-Math.PI / 2} position={[LANE_X[l as 0], 0.007, -20]}>
@@ -404,6 +409,7 @@ export function HighwayScene({ engine, getTime }: { engine: GameEngine; getTime:
               opacity={0.14}
               blending={THREE.AdditiveBlending}
               depthWrite={false}
+              toneMapped={false}
             />
           </mesh>
         </group>
@@ -432,6 +438,7 @@ export function HighwayScene({ engine, getTime }: { engine: GameEngine; getTime:
               opacity={0.35}
               blending={THREE.AdditiveBlending}
               depthWrite={false}
+              toneMapped={false}
             />
           </mesh>
         </group>
